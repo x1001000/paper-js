@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<body bgcolor='black'>
+
+<canvas id="myCanvas" width="600" height="600"
+style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+/*/
+var t_min = 0, t_max = 2 * Math.PI;
+var scale = 1, step = 10, inc = t_max/step, i = 0;
+//*/
+var startX = 100;
+var startY = 200;
+var startR = 1;
+var i = 0;
+var j = 0;
+var r = 1;
+var upper = new Array();
+var lower = new Array();
+var center = new Array();
+var vector = new Array();
+var normal = new Array();
+/*
+function coordinate(x, y) {
+  this.x = x;
+  this.y = y;
+  }
+//*/
+ctx.strokeStyle = 'red';
+ctx.beginPath();
+ctx.moveTo(0, 200);
+for (var t=0; t<=2*Math.PI; t+=2*Math.PI/10){
+  y = 40 * Math.sin(t);
+  x = (t / (2*Math.PI)) * 600;
+  ctx.lineTo(x, 200-y);
+  upper.push(new Array(2));
+  upper[i][0] = x;
+  upper[i][1] = 200-y;
+  document.write('<br>')
+  document.write(upper[i][0]);
+  document.write('\t')
+  document.write(upper[i][1]);
+  i++;
+  }
+ctx.stroke();
+ctx.closePath();
+
+document.write('<br>')
+
+ctx.strokeStyle = 'red';
+ctx.beginPath();
+ctx.moveTo(0, 300);
+for (var t=0; t<=Math.PI; t+=Math.PI/10){
+  y = 40 * Math.sin(t);
+  x = (t / (Math.PI)) * 600;
+  ctx.lineTo(x, 300+y);
+  lower.push(new Array(2));
+  lower[j][0] = x;
+  lower[j][1] = 300+y;
+  document.write('<br>')
+  document.write(lower[j][0]);
+  document.write('\t')
+  document.write(lower[j][1]);
+  j++;
+  }
+ctx.stroke();
+ctx.closePath();
+
+
+
+ctx.strokeStyle = 'green';
+while(true){
+  if(((startY - startR - r) > (200 - 40 * Math.sin(startX / 600 * 2*Math.PI))) && ((startY + startR + r) < (300 + 40 * Math.sin(startX / 600 * Math.PI)))){
+      ctx.beginPath();
+      ctx.arc(startX, startY, startR + r, 0, 2*Math.PI);
+      ctx.stroke();
+      ctx.closePath();
+      r++;
+    } else {
+      break;
+    }
+}
+/*
+ctx.strokeStyle = 'red';
+ctx.beginPath();
+ctx.moveTo(0, 300);
+ctx.lineTo(600, 300);
+ctx.stroke();
+ctx.closePath();
+
+center.push(new Array(2));
+center[0][0] = (upper[0][0] + upper[1][0]) / 2;
+center[0][1] = (upper[0][1] + upper[1][1]) / 2;
+var cx = center[0][0];
+var cy = center[0][1];
+var cr = 0;
+vector.push(new Array(2));
+vector[0][0] = upper[0][0] - upper[1][0];
+vector[0][1] = upper[0][1] - upper[1][1];
+var vx = vector[0][0];
+var vy = vector[0][1];
+var v = Math.sqrt(vx*vx + vy*vy);
+normal.push(new Array(2));
+normal[0][0] = vy / v;
+normal[0][1] = -vx / v;
+var nx = normal[0][0];
+var ny = normal[0][1];
+for(var t = 0; t < 100; t++){
+  cx = cx + nx * t;
+  cy = cy + ny * t;
+  cr++;
+  ctx.strokeStyle = 'green';
+  ctx.beginPath();
+  ctx.arc(cx, cy, cr, 0, 2*Math.PI);
+  ctx.stroke();
+  ctx.closePath();
+}
+//*/
+</script>
+</body>
+</html>

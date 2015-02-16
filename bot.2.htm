@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Play with Paper.js</title>
+  <link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen">
+  <script src="./js/lib/jquery-1.9.1.min.js"></script>
+  <script src="./js/lib/gl-matrix-min.js"></script>
+  <script src="./js/lib/sax.js"></script>
+  <script src="./js/lib/q.min.js"></script>
+  <script src="./js/g0v/utils.stroke-words.js"></script>
+  <script src="./js/paper.js"></script>
+  <script type="text/paperscript" canvas="myCanvas">
+  var data = new WordStroker.utils.StrokeData({url: "./json/"})
+  var c    = WordStroker.utils.sortSurrogates("林")
+
+  var wordGroup = new Group
+
+  var divisionPoint = new Point()
+  var divisionPointsAmount = 8
+
+  var nearestPoint = new Point()
+
+  var tracePoint = new Point()
+  var traceRadius
+
+  function circleGrow(tangent, center){
+    tracePoint = (center + (center - tangent) / (center - tangent).length).round()
+    traceRadius = (center - tangent).length + 1}
+  function isCircleFitPath(tangent, center, path){
+    if((tangent - path.getNearestPoint(center)).length < 10) {return false} else {return true}}
+
+  for (n in c) {
+    data.get(c[n].cp).then(function(strokes) {
+      for (i in strokes) {
+        //var stroke = strokes[i]
+        var outlinePath = new Path()
+        wordGroup.addChild(outlinePath)
+        //outlinePath.fillColor = "white"
+        for (j in strokes[i].outline) {
+          var point = strokes[i].outline[j]
+          switch (point.type) {
+            case "M":
+              outlinePath.moveTo(new Point(point.x, point.y))
+              break
+            case "L":
+              outlinePath.lineTo(new Point(point.x, point.y))
+              break
+            case "Q":
+              outlinePath.quadraticCurveTo(
+                new Point(point.begin.x, point.begin.y),
+                new Point(point.end.x, point.end.y)
+              )
+              break
+            case "C":
+              outlinePath.cubicCurveTo(
+                new Point(point.begin.x, point.begin.y),
+                new Point(point.mid.x, point.mid.y),
+                new Point(point.end.x, point.end.y)
+              )
+              break}}
+        outlinePath.closePath()
+        //document.write(strokes[i].track.length)
+        var trackPath = new Path()
+        wordGroup.addChild(trackPath)
+        for (j in strokes[i].track) {
+          var point = strokes[i].track[j]
+          if (j==0) {
+            trackPath.moveTo(new Point(point.x, point.y))} else {
+            trackPath.lineTo(new Point(point.x, point.y))}}
+
+        for (j = 0; j <= divisionPointsAmount + 1; j++) {
+          var offset = j * trackPath.length / (divisionPointsAmount + 1)
+          divisionPoint = trackPath.getPointAt(offset)
+          var circle = new Path.Circle({
+            center: divisionPoint,
+            radius: 5,
+            strokeColor: 'red'})
+          nearestPoint = outlinePath.getNearestPoint(divisionPoint)
+          var circle = new Path.Circle({
+            center: nearestPoint,
+            radius: 5,
+            strokeColor: 'green'})
+          do{circleGrow(nearestPoint, divisionPoint); divisionPoint = tracePoint}
+          while(!isCircleFitPath(nearestPoint, divisionPoint, outlinePath))
+          var circle = new Path.Circle({
+            center: tracePoint,
+            radius: traceRadius,
+            strokeColor: 'black'})
+          }
+          }
+      wordGroup.scale(1, new Point(0, 0))
+      wordGroup.fullySelected = true
+      })
+
+      }</script>
+      </head>
+      <body style="margin: 0; padding: 0;">
+        <canvas id="myCanvas" height=2000 width="2000"></canvas>
+        <p id="copyright">x1001000@gmail.com</p>
+      </body>
+      </html>
