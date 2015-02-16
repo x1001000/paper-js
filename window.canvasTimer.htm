@@ -7,7 +7,7 @@
                 document.writeln(text);
                 }
             function drawCanvas () {
-                printf('<canvas id="canvas" width="500" height="600"></canvas>');
+                printf('<canvas id="canvas" width="2000" height="2000"></canvas>');
                 }
 
             function alterCanvas() {
@@ -18,22 +18,25 @@
                 var canvas = document.getElementById("canvas");
                 var ctx = canvas.getContext("2d");
 
-                window.canvasTimer = setInterval(redraw, 100);
+                window.canvasTimer = setInterval(redraw, 1000);
 
                 function reset() {
                     ctx.clearRect(0,0,500,500); // clear canvas
                     }
 
                 function redraw() {
-                    x = x + 1;
-                    y = y + 2;
+
+                    reset()
+
+                    x = x + 100;
+                    y = y + 100;
 
                     ctx.strokeStyle = 'rgb(255,0,0)';
                     ctx.lineWidth = 10;
 
                     ctx.beginPath();
-                    ctx.arc(x, y, radius, 0, Math.PI * 2, false);
-                  //  ctx.closePath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 1, false);
+                    ctx.closePath();
                     ctx.stroke();
                     }
                 }

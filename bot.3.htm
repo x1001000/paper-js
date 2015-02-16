@@ -12,28 +12,39 @@
   <script src="./js/paper.js"></script>
   <script type="text/paperscript" canvas="myCanvas">
   var data = new WordStroker.utils.StrokeData({url: "./json/"})
-  var c    = WordStroker.utils.sortSurrogates("林")
+  var c    = WordStroker.utils.sortSurrogates("ㄓ")
 
   var wordGroup = new Group
 
-  var divisionPoint = new Point()
-  var divisionPointsAmount = 26
-
-  var nearestPoint = new Point()
+  var outlinePoint = new Point()
+  var outlinePoints = new Array()
 
   var tracePoint = new Point()
   var traceRadius
 
-  function circleGrow(tangent, center){
-    tracePoint = (center + (center - tangent) / (center - tangent).length).round()
-    traceRadius = (center - tangent).length + 1}
-  function isCircleFitPath(tangent, center, path){
-    if((tangent - path.getNearestPoint(center)).length < 10) {return false} else {return true}}
+  function thinPath(outlinePath) {
+    var thinPath = new Path()
+    var offset = outlinePath.length / 100
+    for (j = 0; j < 100; j++) {
+      var normal = Point()
+      normal = outlinePath.getNormalAt(offset*j)
+      normal.length = 20
+      thinPath.add(outlinePath.getPointAt(offset*j) - normal) }
+    thinPath.closePath()
+    thinPath.smooth()
+    console.log(thinPath.area)
+    return thinPath
+  }
+var i=0
+  function draw() {
+    i=i +1
+    wordGroup.scale(1, new Point(i, 0))
+    wordGroup.fullySelected = true
+  }
 
   for (n in c) {
     data.get(c[n].cp).then(function(strokes) {
       for (i in strokes) {
-        //var stroke = strokes[i]
         var outlinePath = new Path()
         wordGroup.addChild(outlinePath)
         //outlinePath.fillColor = "white"
@@ -58,39 +69,20 @@
                 new Point(point.mid.x, point.mid.y),
                 new Point(point.end.x, point.end.y)
               )
-              break}}
+              break}
+          outlinePoints.push(outlinePoint)}
         outlinePath.closePath()
-        //document.write(strokes[i].track.length)
-        var trackPath = new Path()
-        wordGroup.addChild(trackPath)
-        for (j in strokes[i].track) {
-          var point = strokes[i].track[j]
-          if (j==0) {
-            trackPath.moveTo(new Point(point.x, point.y))} else {
-            trackPath.lineTo(new Point(point.x, point.y))}}
+        //console.log(outlinePath.curves.length)
 
-        for (j = 0; j <= divisionPointsAmount + 1; j++) {
-          var offset = j * trackPath.length / (divisionPointsAmount + 1)
-          divisionPoint = trackPath.getPointAt(offset)
-          var circle = new Path.Circle({
-            center: divisionPoint,
-            radius: 5,
-            strokeColor: 'red'})
-          nearestPoint = outlinePath.getNearestPoint(divisionPoint)
-          var circle = new Path.Circle({
-            center: nearestPoint,
-            radius: 5,
-            strokeColor: 'green'})
-          do{circleGrow(nearestPoint, divisionPoint); divisionPoint = tracePoint}
-          while(!isCircleFitPath(nearestPoint, divisionPoint, outlinePath))
-          var circle = new Path.Circle({
-            center: tracePoint,
-            radius: traceRadius,
-            strokeColor: 'black'})
+        wordGroup.addChild(thinPath(outlinePath))
+
+
+
+
           }
-          }
-      wordGroup.scale(1, new Point(0, 0))
-      wordGroup.fullySelected = true
+      window.canvasTimer = setInterval(draw, 1000)
+
+
       })
 
       }</script>
