@@ -2,7 +2,7 @@
 <html lang="en" style="height: 100%;">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Play with Paper.js</title>
+  <title>Play with Paper.js</title></head>
   <link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen">
   <script src="./js/lib/jquery-1.9.1.min.js"></script>
   <script src="./js/lib/gl-matrix-min.js"></script>
@@ -16,79 +16,67 @@
 
   var wordGroup = new Group
 
-  var outlinePoint = new Point()
-  var outlinePoints = new Array()
-
-  var tracePoint = new Point()
-  var traceRadius
-
   function thinPath(outlinePath) {
     var thinPath = new Path()
     var offset = outlinePath.length / 100
     for (j = 0; j < 100; j++) {
       var normal = Point()
       normal = outlinePath.getNormalAt(offset*j)
-      normal.length = 20
+      normal.length = 10
       thinPath.add(outlinePath.getPointAt(offset*j) - normal) }
     thinPath.closePath()
     thinPath.smooth()
-    console.log(thinPath.area)
+    //console.log(thinPath.area)
     return thinPath
   }
-var i=0
-  function draw() {
-    i=i +1
-    wordGroup.scale(1, new Point(i, 0))
-    wordGroup.fullySelected = true
+  function outlinePath(strokes) {
+    for (i in strokes) {
+      var outlinePath = new Path()
+      //outlinePath.fillColor = "white"
+      wordGroup.addChild(outlinePath)
+      for (j in strokes[i].outline) {
+        var point = strokes[i].outline[j]
+        switch (point.type) {
+          case "M":
+            outlinePath.moveTo(new Point(point.x, point.y))
+            break
+          case "L":
+            outlinePath.lineTo(new Point(point.x, point.y))
+            break
+          case "Q":
+            outlinePath.quadraticCurveTo(
+              new Point(point.begin.x, point.begin.y),
+              new Point(point.end.x, point.end.y)
+            )
+            break
+          case "C":
+            outlinePath.cubicCurveTo(
+              new Point(point.begin.x, point.begin.y),
+              new Point(point.mid.x, point.mid.y),
+              new Point(point.end.x, point.end.y)
+            )
+            break
+        }
+      }
+      outlinePath.closePath()
+      //console.log(outlinePath.curves.length)
+      for(i = 0; i < 10; i ++) {
+        console.log(outlinePath.isInside(thinPath(outlinePath)))
+        outlinePath = thinPath(outlinePath)
+        wordGroup.addChild(outlinePath)
+      }
+      //wordGroup.scale(1, new Point(i, 0))
+      wordGroup.fullySelected = true
+    }
   }
 
   for (n in c) {
-    data.get(c[n].cp).then(function(strokes) {
-      for (i in strokes) {
-        var outlinePath = new Path()
-        wordGroup.addChild(outlinePath)
-        //outlinePath.fillColor = "white"
-        for (j in strokes[i].outline) {
-          var point = strokes[i].outline[j]
-          switch (point.type) {
-            case "M":
-              outlinePath.moveTo(new Point(point.x, point.y))
-              break
-            case "L":
-              outlinePath.lineTo(new Point(point.x, point.y))
-              break
-            case "Q":
-              outlinePath.quadraticCurveTo(
-                new Point(point.begin.x, point.begin.y),
-                new Point(point.end.x, point.end.y)
-              )
-              break
-            case "C":
-              outlinePath.cubicCurveTo(
-                new Point(point.begin.x, point.begin.y),
-                new Point(point.mid.x, point.mid.y),
-                new Point(point.end.x, point.end.y)
-              )
-              break}
-          outlinePoints.push(outlinePoint)}
-        outlinePath.closePath()
-        //console.log(outlinePath.curves.length)
+    data.get(c[n].cp).then(outlinePath)
+  }
+  </script>
 
-        wordGroup.addChild(thinPath(outlinePath))
-
-
-
-
-          }
-      window.canvasTimer = setInterval(draw, 1000)
-
-
-      })
-
-      }</script>
-      </head>
-      <body style="margin: 0; padding: 0;">
-        <canvas id="myCanvas" height=2000 width="2000"></canvas>
-        <p id="copyright">x1001000@gmail.com</p>
-      </body>
-      </html>
+<body style="margin: 0; padding: 0;">
+  <canvas id="myCanvas" height=2000 width="2000"></canvas>
+  <p id="copyright">x1001000@gmail.com</p>
+</body>
+</html>
