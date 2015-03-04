@@ -12,7 +12,7 @@
   <script src="./js/paper.js"></script>
   <script type="text/paperscript" canvas="myCanvas">
   var data = new WordStroker.utils.StrokeData({url: "./json/"})
-  var c    = WordStroker.utils.sortSurrogates("ㄓ")
+  var c    = WordStroker.utils.sortSurrogates("快")
 
   var wordGroup = new Group
 
@@ -22,7 +22,7 @@
     for (j = 0; j < 100; j++) {
       var normal = Point()
       normal = outlinePath.getNormalAt(offset*j)
-      normal.length = 10
+      normal.length = 2
       thinPath.add(outlinePath.getPointAt(offset*j) - normal) }
     thinPath.closePath()
     thinPath.smooth()
@@ -60,8 +60,8 @@
       }
       outlinePath.closePath()
       //console.log(outlinePath.curves.length)
-      for(i = 0; i < 10; i ++) {
-        console.log(outlinePath.isInside(thinPath(outlinePath)))
+      for(i = 0; i < 30; i ++) {
+        //console.log(outlinePath.isInside(thinPath(outlinePath)))
         outlinePath = thinPath(outlinePath)
         wordGroup.addChild(outlinePath)
       }
